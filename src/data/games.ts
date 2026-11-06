@@ -15,7 +15,7 @@ export interface Game {
   /** glyph used on slot / live covers */
   glyph?: string
   tags?: ('new' | 'hot' | 'exclusive')[]
-  playable: 'mines' | 'crash' | 'dice' | 'plinko' | 'slot' | 'blackjack' | 'roulette' | 'limbo' | 'keno' | 'wheel' | 'hilo' | null
+  playable: 'mines' | 'crash' | 'dice' | 'plinko' | 'slot' | 'blackjack' | 'roulette' | 'limbo' | 'keno' | 'wheel' | 'hilo' | 'baccarat' | 'dragontiger' | 'goldenwheel' | 'holdem' | null
   rtp: number
   players: number
   blurb: string
@@ -48,12 +48,12 @@ export const GAMES: Game[] = [
   { id: 'thunder-forge', name: 'Thunder Forge', provider: 'Foundry Nine', category: 'slots', art: 'slot', glyph: 'zap', palette: ['#2a2310', '#0e0b05', '#ffd84d'], playable: 'slot', rtp: 96.0, players: 412, blurb: 'Hammers, anvils and crackling sparks.' },
 
   // Live (mock)
-  { id: 'live-blackjack-1', name: 'Blackjack Salon', provider: 'Studio Demo', category: 'live', art: 'live', glyph: 'spade', palette: ['#0f2a20', '#06110c', '#D4AF37'], playable: null, rtp: 99.3, players: 214, blurb: 'Mock preview of a hosted blackjack table.' },
-  { id: 'live-roulette-1', name: 'Roulette Atelier', provider: 'Studio Demo', category: 'live', art: 'live', glyph: 'circle', palette: ['#2e0f12', '#110607', '#D4AF37'], playable: null, rtp: 97.3, players: 388, blurb: 'Mock preview of a hosted roulette table.' },
-  { id: 'live-baccarat-1', name: 'Baccarat Noir', provider: 'Studio Demo', category: 'live', art: 'live', glyph: 'diamond', palette: ['#1b1b24', '#08080c', '#F5D778'], playable: null, rtp: 98.9, players: 167, blurb: 'Mock preview of a hosted baccarat table.' },
-  { id: 'live-game-show', name: 'Golden Wheel Show', provider: 'Studio Demo', category: 'live', art: 'live', glyph: 'star', palette: ['#2b1f0b', '#0f0a04', '#F5D778'], playable: null, rtp: 96.1, players: 542, tags: ['new'], blurb: 'Mock preview of a hosted game show.' },
-  { id: 'live-poker-1', name: "Hold'em Lounge", provider: 'Studio Demo', category: 'live', art: 'live', glyph: 'club', palette: ['#121f2e', '#060b11', '#D4AF37'], playable: null, rtp: 98.4, players: 121, blurb: 'Mock preview of a hosted poker table.' },
-  { id: 'live-dragon', name: 'Dragon & Tiger', provider: 'Studio Demo', category: 'live', art: 'live', glyph: 'flame', palette: ['#2e140b', '#110704', '#ff9a4d'], playable: null, rtp: 96.3, players: 96, blurb: 'Mock preview of a hosted card game.' },
+  { id: 'live-blackjack-1', name: 'Blackjack Salon', provider: 'Studio Demo', category: 'live', art: 'live', glyph: 'spade', palette: ['#0f2a20', '#06110c', '#D4AF37'], playable: 'blackjack', rtp: 99.5, players: 214, blurb: 'Hosted-style blackjack with a simulated dealer. Same rules as Vault Blackjack.' },
+  { id: 'live-roulette-1', name: 'Roulette Atelier', provider: 'Studio Demo', category: 'live', art: 'live', glyph: 'circle', palette: ['#2e0f12', '#110607', '#D4AF37'], playable: 'roulette', rtp: 97.3, players: 388, blurb: 'Single-zero roulette at a simulated hosted table.' },
+  { id: 'live-baccarat-1', name: 'Baccarat Noir', provider: 'Studio Demo', category: 'live', art: 'live', glyph: 'diamond', palette: ['#1b1b24', '#08080c', '#F5D778'], playable: 'baccarat', rtp: 98.9, players: 167, blurb: 'Punto banco from an eight-deck shoe with a simulated host.' },
+  { id: 'live-game-show', name: 'Golden Wheel Show', provider: 'Studio Demo', category: 'live', art: 'live', glyph: 'star', palette: ['#2b1f0b', '#0f0a04', '#F5D778'], playable: 'goldenwheel', rtp: 96, players: 542, tags: ['new'], blurb: 'A 50-segment money wheel. Every bet returns 96%.' },
+  { id: 'live-poker-1', name: "Hold'em Lounge", provider: 'Studio Demo', category: 'live', art: 'live', glyph: 'club', palette: ['#121f2e', '#060b11', '#D4AF37'], playable: 'holdem', rtp: 97.4, players: 121, blurb: "Casino Hold'em against the dealer with an ante bonus table." },
+  { id: 'live-dragon', name: 'Dragon & Tiger', provider: 'Studio Demo', category: 'live', art: 'live', glyph: 'flame', palette: ['#2e140b', '#110704', '#ff9a4d'], playable: 'dragontiger', rtp: 96.3, players: 96, blurb: 'One card each. The higher card wins.' },
 ]
 
 export const byId = (id: string) => GAMES.find((g) => g.id === id)

@@ -77,7 +77,7 @@ export function CategoryPage({ kind }: { kind: 'slots' | 'live' }) {
       <PageHeader
         icon={kind === 'slots' ? <Gamepad2 className="h-4 w-4" /> : <Tv className="h-4 w-4" />}
         title={kind === 'slots' ? 'Slots' : 'Live Casino'}
-        sub={kind === 'slots' ? 'Illustrated demo slots from fictional studios. Every title is playable with Vault Credits.' : 'A visual preview of hosted tables. All content here is clearly labelled mock content; there is no live stream.'}
+        sub={kind === 'slots' ? 'Illustrated demo slots from fictional studios. Every title is playable with Vault Credits.' : 'Hosted-style tables with simulated dealers. Every table is playable with Vault Credits; there is no live stream or real dealer.'}
         right={<DemoPill />}
       />
       <div className="mb-6 flex flex-col lg:flex-row gap-3 lg:items-center">

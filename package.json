@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "build:single": "tsc --noEmit && vite build --mode single",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "odds": "esbuild scripts/odds-sim.ts --bundle --platform=node --loader:.png=empty --log-level=error --outfile=node_modules/.cache/odds.cjs && node node_modules/.cache/odds.cjs"
   },
   "dependencies": {
     "framer-motion": "^11.11.17",

@@ -7,6 +7,7 @@ import { Button, DemoPill, Skeleton } from '../components/ui'
 import { byId, GAMES, ORIGINALS } from '../data/games'
 import { useStore } from '../store'
 import { NotFound } from './Account'
+import { LiveCtx } from '../games/live'
 
 const Mines = lazy(() => import('../games/Mines'))
 const Crash = lazy(() => import('../games/Crash'))
@@ -19,7 +20,12 @@ const Limbo = lazy(() => import('../games/Limbo'))
 const Keno = lazy(() => import('../games/Keno'))
 const Wheel = lazy(() => import('../games/Wheel'))
 const HiLo = lazy(() => import('../games/HiLo'))
-const PLAYABLE = { mines: Mines, crash: Crash, dice: Dice, plinko: Plinko, slot: Slot, blackjack: Blackjack, roulette: Roulette, limbo: Limbo, keno: Keno, wheel: Wheel, hilo: HiLo }
+const Baccarat = lazy(() => import('../games/Baccarat'))
+const DragonTiger = lazy(() => import('../games/DragonTiger'))
+const GoldenWheel = lazy(() => import('../games/GoldenWheel'))
+const Holdem = lazy(() => import('../games/Holdem'))
+const PLAYABLE = { mines: Mines, crash: Crash, dice: Dice, plinko: Plinko, slot: Slot, blackjack: Blackjack, roulette: Roulette, limbo: Limbo, keno: Keno, wheel: Wheel, hilo: HiLo, baccarat: Baccarat, dragontiger: DragonTiger, goldenwheel: GoldenWheel, holdem: Holdem }
+const HOSTS: Record<string, string> = { 'live-blackjack-1': 'Elena', 'live-roulette-1': 'Marco', 'live-baccarat-1': 'Mei', 'live-game-show': 'Jules', 'live-poker-1': 'Theo', 'live-dragon': 'Kai' }
 
 function GameSkeleton() {
   return (
@@ -41,7 +47,7 @@ export default function GamePage() {
   return (
     <div className="space-y-12">
       {C ? (
-        <Suspense fallback={<GameSkeleton />}><C key={game.id} game={game} /></Suspense>
+        <LiveCtx.Provider value={game.category === 'live' ? { host: HOSTS[game.id] ?? 'Host', table: game.name } : null}><Suspense fallback={<GameSkeleton />}><C key={game.id} game={game} /></Suspense></LiveCtx.Provider>
       ) : (
         <div className="relative overflow-hidden rounded-2xl border border-steel/70 bg-coal">
           <div className="absolute inset-0 opacity-40 blur-2xl scale-110"><GameArt game={game} className="h-full w-full" /></div>

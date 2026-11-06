@@ -81,7 +81,7 @@ export default function Home() {
           <Shelf title="Popular Games" icon={<Flame className="h-[18px] w-[18px]" />} sub="Most played this hour (simulated)" games={POPULAR} viewAll="/originals" loading={loading} />
           <PromoStrip />
           <Shelf title="Slots" icon={<Gamepad2 className="h-[18px] w-[18px]" />} sub="Fictional studios · demo play" games={SLOTS} viewAll="/slots" loading={loading} />
-          <Shelf title="Live Casino" icon={<Tv className="h-[18px] w-[18px]" />} sub="Mock previews of hosted tables" games={LIVE} viewAll="/live" loading={loading} />
+          <Shelf title="Live Casino" icon={<Tv className="h-[18px] w-[18px]" />} sub="Simulated hosted tables, all playable" games={LIVE} viewAll="/live" loading={loading} />
           <Shelf title="New Releases" icon={<Zap className="h-[18px] w-[18px]" />} games={NEW_RELEASES} viewAll="/originals" loading={loading} />
         </>
       )}

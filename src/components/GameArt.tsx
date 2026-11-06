@@ -150,9 +150,9 @@ export function GameArt({ game, className = '' }: { game: Game; className?: stri
       )}
       {game.category === 'live' && (
         <g>
-          <rect x="18" y="18" width="98" height="20" rx="4" fill="#000" fillOpacity="0.55" />
+          <rect x="18" y="18" width="104" height="20" rx="4" fill="#000" fillOpacity="0.55" />
           <circle cx="30" cy="28" r="3.5" fill="#E5484D" />
-          <text x="40" y="32" fontFamily="Sora, sans-serif" fontSize="9.5" fontWeight="700" letterSpacing="1.4" fill="#F7F7F8">MOCK LIVE</text>
+          <text x="40" y="32" fontFamily="Sora, sans-serif" fontSize="9.5" fontWeight="700" letterSpacing="1.4" fill="#F7F7F8">LIVE-STYLE</text>
         </g>
       )}
       <rect x="120" y="318" width="60" height="1" fill="#D4AF37" opacity="0.5" />

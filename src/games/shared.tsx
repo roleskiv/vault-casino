@@ -4,6 +4,7 @@ import { useState, type ReactNode } from 'react'
 import { ActivityTable } from '../components/Activity'
 import { Segmented, DemoPill } from '../components/ui'
 import { SoundButton } from '../components/Polish'
+import { LiveHostBar, useLive } from './live'
 import type { Game } from '../data/games'
 import { cn, fmt } from '../lib/format'
 import { useStore } from '../store'
@@ -86,7 +87,8 @@ export function RecentStrip({ items }: { items: { id: string; m: number; win: bo
 
 export interface GameInfo { howTo: string[]; fairness: string; odds: ReactNode }
 
-export function GameShell({ game, stage, panel, info, top }: { game: Game; stage: ReactNode; panel: ReactNode; info: GameInfo; top?: ReactNode }) {
+export function GameShell({ game, stage, panel, info, top, liveStatus }: { game: Game; stage: ReactNode; panel: ReactNode; info: GameInfo; top?: ReactNode; liveStatus?: string }) {
+  const live = useLive()
   const { favorites, toggleFavorite } = useStore()
   const fav = favorites.includes(game.id)
   const [tab, setTab] = useState<'how' | 'fair' | 'odds'>('how')
@@ -108,13 +110,14 @@ export function GameShell({ game, stage, panel, info, top }: { game: Game; stage
       <div className="overflow-hidden rounded-2xl border border-steel/70 bg-coal">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div className="relative order-1 min-w-0 border-b lg:border-b-0 lg:border-r border-steel/70 bg-[radial-gradient(ellipse_at_50%_0%,rgba(212,175,55,0.07),transparent_60%)]">
+            {live && <div className="px-4 sm:px-6 pt-4"><LiveHostBar status={liveStatus} /></div>}
             {top && <div className="px-4 sm:px-6 pt-4">{top}</div>}
             <div className="p-4 sm:p-6">{stage}</div>
           </div>
           <div className="order-2 min-w-0 p-4 sm:p-5 space-y-4 bg-coal">{panel}</div>
         </div>
         <div className="flex items-center gap-2 border-t border-steel/70 px-4 sm:px-6 h-11 text-xs text-silver">
-          <ShieldCheck className="h-3.5 w-3.5 text-gold" /> Demo mode · outcomes generated locally · RTP ≈ <span className="num text-snow">{game.rtp}%</span>
+          <ShieldCheck className="h-3.5 w-3.5 text-gold" /> Demo mode{live ? ' · simulated table, no live stream' : ''} · outcomes generated locally · RTP ≈ <span className="num text-snow">{game.rtp}%</span>
           <span className="ml-auto hidden sm:inline">Vault Credits have no cash value</span>
         </div>
       </div>
