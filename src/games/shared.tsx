@@ -1,8 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Heart, Info, ShieldCheck, Volume2, Maximize2, BookOpen, History, Scale } from 'lucide-react'
+import { Heart, Info, ShieldCheck, Maximize2, BookOpen, History, Scale } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { ActivityTable } from '../components/Activity'
 import { Segmented, DemoPill } from '../components/ui'
+import { SoundButton } from '../components/Polish'
 import type { Game } from '../data/games'
 import { cn, fmt } from '../lib/format'
 import { useStore } from '../store'
@@ -86,7 +87,7 @@ export function RecentStrip({ items }: { items: { id: string; m: number; win: bo
 export interface GameInfo { howTo: string[]; fairness: string; odds: ReactNode }
 
 export function GameShell({ game, stage, panel, info, top }: { game: Game; stage: ReactNode; panel: ReactNode; info: GameInfo; top?: ReactNode }) {
-  const { favorites, toggleFavorite, toast } = useStore()
+  const { favorites, toggleFavorite } = useStore()
   const fav = favorites.includes(game.id)
   const [tab, setTab] = useState<'how' | 'fair' | 'odds'>('how')
   return (
@@ -99,7 +100,7 @@ export function GameShell({ game, stage, panel, info, top }: { game: Game; stage
         <div className="flex items-center gap-2">
           <DemoPill />
           <button onClick={() => toggleFavorite(game.id)} aria-label="Favourite" className={cn('grid h-9 w-9 place-items-center rounded-lg border border-steel bg-coal transition-colors', fav ? 'text-gold border-gold/40' : 'text-silver hover:text-snow')}><Heart className={cn('h-4 w-4', fav && 'fill-current')} /></button>
-          <button onClick={() => toast({ title: 'Sound is off in the prototype', tone: 'info' })} aria-label="Sound" className="hidden sm:grid h-9 w-9 place-items-center rounded-lg border border-steel bg-coal text-silver hover:text-snow"><Volume2 className="h-4 w-4" /></button>
+          <SoundButton />
           <button onClick={() => document.documentElement.requestFullscreen?.().catch(() => {})} aria-label="Fullscreen" className="hidden sm:grid h-9 w-9 place-items-center rounded-lg border border-steel bg-coal text-silver hover:text-snow"><Maximize2 className="h-4 w-4" /></button>
         </div>
       </div>

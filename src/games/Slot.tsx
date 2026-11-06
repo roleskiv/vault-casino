@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { sfx } from '../lib/sfx'
 import { Crown, Diamond, Star, Bell, Clover } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '../components/ui'
@@ -68,6 +69,7 @@ export default function Slot({ game }: { game: Game }) {
 
   const spin = async () => {
     if (!placeBet(wager)) return false
+    sfx('spin')
     const g = Array.from({ length: 5 }, () => Array.from({ length: 3 }, () => randomSymbol()))
     setWin(null); setBanner(false); setSpinning(true); setGrid(g); setSpinId((n) => n + 1)
     await new Promise((r) => setTimeout(r, 1250))

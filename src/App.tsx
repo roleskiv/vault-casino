@@ -12,6 +12,7 @@ import { PromotionsPage, TournamentsPage, LeaderboardsPage } from './pages/Commu
 import VipPage from './pages/Vip'
 import { ProfilePage, RewardsPage, TransactionsPage, SettingsPage, ResponsiblePage, NotFound } from './pages/Account'
 import { useStore } from './store'
+import { BigWin, DailySpinModal, Tour } from './components/Polish'
 
 function Splash({ done }: { done: boolean }) {
   return (
@@ -80,6 +81,9 @@ export default function App() {
       <BottomNav onMenu={() => setDrawer(true)} onSearch={() => setSearch(true)} />
       <Toasts />
       <GlobalModals />
+      <DailySpinModal />
+      <Tour />
+      <BigWin />
     </MotionConfig>
   )
 }

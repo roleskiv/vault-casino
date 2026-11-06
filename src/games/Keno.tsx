@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { sfx } from '../lib/sfx'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '../components/ui'
 import type { Game } from '../data/games'
@@ -54,7 +55,7 @@ export default function Keno({ game }: { game: Game }) {
     const pool = Array.from({ length: N }, (_, i) => i + 1)
     for (let i = N - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]] }
     const d = pool.slice(0, DRAW)
-    for (let i = 0; i < DRAW; i++) { await new Promise((r) => setTimeout(r, 110)); setDrawn(d.slice(0, i + 1)) }
+    for (let i = 0; i < DRAW; i++) { await new Promise((r) => setTimeout(r, 110)); setDrawn(d.slice(0, i + 1)); sfx(picks.includes(d[i]) ? 'reveal' : 'tick') }
     const hits = d.filter((x) => picks.includes(x)).length
     const m = pays[hits] ?? 0
     setRes({ m, hits })

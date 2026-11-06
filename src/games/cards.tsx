@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion'
+import { sfx } from '../lib/sfx'
 import { cn, rand } from '../lib/format'
 
 export interface PCard { rank: number; suit: 0 | 1 | 2 | 3; id: string }
 export const SUITS = ['♠', '♥', '♦', '♣'] as const
 export const RANKS = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
 let n = 0
-export const drawCard = (): PCard => ({ rank: 1 + Math.floor(rand() * 13), suit: Math.floor(rand() * 4) as PCard['suit'], id: `c${++n}` })
+export const drawCard = (): PCard => (sfx('card'), { rank: 1 + Math.floor(rand() * 13), suit: Math.floor(rand() * 4) as PCard['suit'], id: `c${++n}` })
 
 export function PlayingCard({ card, hidden, size = 'md', dim, highlight, delay = 0 }: { card?: PCard; hidden?: boolean; size?: 'sm' | 'md' | 'lg'; dim?: boolean; highlight?: 'win' | 'lose'; delay?: number }) {
   const red = card && (card.suit === 1 || card.suit === 2)

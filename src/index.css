@@ -55,3 +55,5 @@ input[type=range].vault-range::-moz-range-track { height: 10px; background: tran
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
+
+@keyframes wiggle { 0%, 80%, 100% { transform: rotate(0) } 84% { transform: rotate(-14deg) } 88% { transform: rotate(12deg) } 92% { transform: rotate(-8deg) } 96% { transform: rotate(4deg) } }

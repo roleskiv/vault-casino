@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { uid } from './lib/format'
+import { setSfxEnabled, sfx } from './lib/sfx'
 
 export interface BetRecord { id: string; game: string; gameId: string; wager: number; multiplier: number; payout: number; time: number }
 export interface Txn { id: string; type: 'credit' | 'wager' | 'payout' | 'reward'; amount: number; note: string; time: number }
@@ -23,7 +24,12 @@ interface State {
   favorites: string[]
   settings: Settings
   claimed: string[]
+  tourDone: boolean
+  lastDailySpin: number
 }
+
+export interface Celebration { id: string; game: string; multiplier: number; payout: number }
+export const DAILY_MS = 24 * 3600e3
 
 const DEFAULT: State = {
   loggedIn: true,
@@ -36,20 +42,28 @@ const DEFAULT: State = {
     { id: 'seed2', type: 'reward', amount: 2450, note: 'Gold level-up bonus (demo)', time: Date.now() - 86400e3 * 1.2 },
   ],
   favorites: ['vault-crash', 'vault-mines', 'sakura-drift'],
-  settings: { hideBalance: false, sounds: false, reduceMotion: false, sessionReminder: 60, wagerLimit: 0, instantBet: false },
+  settings: { hideBalance: false, sounds: true, reduceMotion: false, sessionReminder: 60, wagerLimit: 0, instantBet: false },
   claimed: [],
+  tourDone: false,
+  lastDailySpin: 0,
 }
 
 const KEY = 'vault-demo-state-v1'
 function load(): State {
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return { ...DEFAULT, ...JSON.parse(raw), settings: { ...DEFAULT.settings, ...JSON.parse(raw).settings } }
+    if (raw) {
+      const p = JSON.parse(raw)
+      const settings = { ...DEFAULT.settings, ...p.settings }
+      // sounds were a placeholder before v2; switch them on once for existing demo states
+      if (p.lastDailySpin === undefined) settings.sounds = true
+      return { ...DEFAULT, ...p, settings }
+    }
   } catch { /* storage unavailable */ }
   return DEFAULT
 }
 
-type Modal = null | 'credits' | 'login' | 'register'
+type Modal = null | 'credits' | 'login' | 'register' | 'daily' | 'tour'
 
 interface Ctx extends State {
   toasts: Toast[]
@@ -68,6 +82,10 @@ interface Ctx extends State {
   toggleFavorite: (id: string) => void
   updateSettings: (p: Partial<Settings>) => void
   resetDemo: () => void
+  celebration: Celebration | null
+  clearCelebration: () => void
+  claimDailySpin: (amount: number) => void
+  finishTour: () => void
 }
 
 const StoreCtx = createContext<Ctx | null>(null)
@@ -76,8 +94,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [s, setS] = useState<State>(load)
   const [toasts, setToasts] = useState<Toast[]>([])
   const [modal, setModal] = useState<Modal>(null)
+  const [celebration, setCelebration] = useState<Celebration | null>(null)
+  const lastCeleb = useRef(0)
   const ref = useRef(s)
   ref.current = s
+  useEffect(() => { setSfxEnabled(s.settings.sounds) }, [s.settings.sounds])
 
   useEffect(() => {
     try { localStorage.setItem(KEY, JSON.stringify(s)) } catch { /* ignore */ }
@@ -101,6 +122,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const next = { ...cur, balance: +(cur.balance - wager).toFixed(2), wagered: cur.wagered + wager }
     ref.current = next
     setS(next)
+    sfx('bet')
     return true
   }, [toast])
 
@@ -108,6 +130,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const payout = +(wager * multiplier).toFixed(2)
     const time = Date.now()
     const bet: BetRecord = { id: uid(), game, gameId, wager, multiplier, payout, time }
+    const big = multiplier >= 10 && payout > wager
+    if (big) sfx('bigwin'); else if (payout > wager) sfx('win'); else if (payout > 0) sfx('coin'); else sfx('lose')
+    if (big && Date.now() - lastCeleb.current > 3500) {
+      lastCeleb.current = Date.now()
+      setCelebration({ id: uid(), game, multiplier, payout })
+    }
     setS((cur) => {
       const txns: Txn[] = [{ id: uid(), type: 'wager', amount: -wager, note: game, time }]
       if (payout > 0) txns.unshift({ id: uid(), type: 'payout', amount: payout, note: `${game} · ${multiplier.toFixed(2)}×`, time })
@@ -143,12 +171,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setS((cur) => ({ ...cur, favorites: cur.favorites.includes(id) ? cur.favorites.filter((f) => f !== id) : [...cur.favorites, id] }))
   }, [])
   const updateSettings = useCallback((p: Partial<Settings>) => setS((cur) => ({ ...cur, settings: { ...cur.settings, ...p } })), [])
-  const resetDemo = useCallback(() => { setS(DEFAULT); toast({ title: 'Demo reset', body: 'Balance and history restored to defaults.', tone: 'info' }) }, [toast])
+  const clearCelebration = useCallback(() => setCelebration(null), [])
+  const claimDailySpin = useCallback((amount: number) => {
+    setS((cur) => Date.now() - cur.lastDailySpin < DAILY_MS ? cur : ({
+      ...cur, balance: cur.balance + amount, lastDailySpin: Date.now(),
+      txns: [{ id: uid(), type: 'reward' as const, amount, note: 'Daily free spin', time: Date.now() }, ...cur.txns],
+    }))
+  }, [])
+  const finishTour = useCallback(() => { setS((cur) => ({ ...cur, tourDone: true })); setModal(null) }, [])
+  const resetDemo = useCallback(() => { setS({ ...DEFAULT, tourDone: true }); toast({ title: 'Demo reset', body: 'Balance and history restored to defaults.', tone: 'info' }) }, [toast])
 
   const value = useMemo<Ctx>(() => ({
     ...s, toasts, modal, openModal: setModal, toast, dismissToast, placeBet, settle, addCredits, claimReward,
-    login, logout, toggleFavorite, updateSettings, resetDemo,
-  }), [s, toasts, modal, toast, dismissToast, placeBet, settle, addCredits, claimReward, login, logout, toggleFavorite, updateSettings, resetDemo])
+    login, logout, toggleFavorite, updateSettings, resetDemo, celebration, clearCelebration, claimDailySpin, finishTour,
+  }), [s, toasts, modal, toast, dismissToast, placeBet, settle, addCredits, claimReward, login, logout, toggleFavorite, updateSettings, resetDemo, celebration, clearCelebration, claimDailySpin, finishTour])
 
   return <StoreCtx.Provider value={value}>{children}</StoreCtx.Provider>
 }

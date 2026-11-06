@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { sfx } from '../lib/sfx'
 import { useEffect, useRef, useState } from 'react'
 import { Button, Segmented } from '../components/ui'
 import type { Game } from '../data/games'
@@ -37,6 +38,7 @@ export default function Wheel({ game }: { game: Game }) {
 
   const spin = async () => {
     if (!placeBet(wager)) return false
+    sfx('spin')
     setBusy(true); setRes(null)
     const idx = Math.floor(rand() * n)
     const jitter = (rand() - 0.5) * seg * 0.7

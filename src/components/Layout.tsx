@@ -10,6 +10,7 @@ import { tierFor } from '../data/vip'
 import { cn, fmt } from '../lib/format'
 import { useSimFeed } from '../lib/sim'
 import { useStore } from '../store'
+import { DailySpinButton } from './Polish'
 import { GameArt } from './GameArt'
 import { AnimatedNumber, Button, DemoPill, Logo, Modal } from './ui'
 import { TierEmblem } from './TierEmblem'
@@ -237,6 +238,8 @@ export function TopNav({ onMenu, onActivity, activityOpen }: { onMenu: () => voi
             <Button variant="gold" size="md" onClick={() => openModal('register')}>Register</Button>
           </div>
         )}
+
+        <DailySpinButton />
 
         <div ref={nRef} className="relative hidden sm:block">
           <button onClick={() => { setNotif((v) => !v); setUnread(false) }} aria-label="Notifications" className="relative grid h-10 w-10 place-items-center rounded-lg border border-steel bg-coal text-silver hover:text-snow transition-colors">

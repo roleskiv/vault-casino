@@ -5,6 +5,7 @@ import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 
 import { Link } from 'react-router-dom'
 import { Shelf } from '../components/GameCard'
 import { Avatar } from '../components/Layout'
+import { useDailySpin } from '../components/Polish'
 import { TierEmblem } from '../components/TierEmblem'
 import { AnimatedNumber, Button, DemoPill, Segmented, Toggle } from '../components/ui'
 import { byId, GAMES } from '../data/games'
@@ -129,7 +130,8 @@ export function ProfilePage() {
 }
 
 export function RewardsPage() {
-  const { claimed, claimReward, toast, wagered } = useStore()
+  const { claimed, claimReward, toast, wagered, openModal } = useStore()
+  const daily = useDailySpin()
   const [code, setCode] = useState('')
   const { tier } = tierFor(wagered)
   const items = [
@@ -141,6 +143,14 @@ export function RewardsPage() {
   return (
     <div>
       <PageHeader icon={<Gift className="h-4 w-4" />} title="Rewards" sub="Everything here pays out in fictional Vault Credits. They cannot be withdrawn or exchanged." right={<DemoPill />} />
+      <button onClick={() => openModal('daily')} className="group mb-6 flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-gold/35 bg-[radial-gradient(ellipse_at_0%_50%,rgba(212,175,55,0.16),transparent_60%)] p-5 text-left hover:border-gold/60 transition-colors">
+        <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full border-2 border-gold/60 bg-[conic-gradient(#D4AF37_0_45deg,#262b33_45deg_90deg,#8a7430_90deg_135deg,#262b33_135deg_180deg,#D4AF37_180deg_225deg,#262b33_225deg_270deg,#E5484D_270deg_315deg,#262b33_315deg)] transition-transform duration-500 group-hover:rotate-45"><span className="h-5 w-5 rounded-full bg-coal border border-gold/60" /></span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-display text-lg font-bold">Daily free spin</span>
+          <span className="block text-sm text-silver">{daily.ready ? 'Ready now. Win up to 2,500 demo VC.' : 'Already spun today. Come back tomorrow.'}</span>
+        </span>
+        <span className={cn('shrink-0 rounded-lg px-3.5 h-9 inline-flex items-center text-sm font-semibold', daily.ready ? 'gold-fill text-ink' : 'border border-steel text-silver')}>{daily.ready ? 'Spin' : 'View'}</span>
+      </button>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {items.map((r, i) => {
           const done = claimed.includes(r.id)
@@ -200,7 +210,7 @@ function Row({ title, sub, children }: { title: string; sub: string; children: R
 }
 
 export function SettingsPage() {
-  const { settings, updateSettings, resetDemo, username } = useStore()
+  const { settings, updateSettings, resetDemo, username, openModal } = useStore()
   return (
     <div>
       <PageHeader icon={<Cog className="h-4 w-4" />} title="Settings" sub="Preferences are stored only in this browser." />
@@ -209,8 +219,9 @@ export function SettingsPage() {
           <h3 className="font-semibold">Account</h3>
           <Row title="Username" sub="Shown on demo leaderboards"><span className="text-sm text-silver">{username}</span></Row>
           <Row title="Hide balance" sub="Mask your wallet in the header"><Toggle checked={settings.hideBalance} onChange={(v) => updateSettings({ hideBalance: v })} label="Hide balance" /></Row>
-          <Row title="Game sounds" sub="Not available in the prototype"><Toggle checked={settings.sounds} onChange={(v) => updateSettings({ sounds: v })} label="Sounds" /></Row>
-          <Row title="Reduce motion" sub="Minimise interface animation"><Toggle checked={settings.reduceMotion} onChange={(v) => updateSettings({ reduceMotion: v })} label="Reduce motion" /></Row>
+          <Row title="Game sounds" sub="Bets, wins, reveals and spins"><Toggle checked={settings.sounds} onChange={(v) => updateSettings({ sounds: v })} label="Sounds" /></Row>
+          <Row title="Reduce motion" sub="Minimise interface animation and win effects"><Toggle checked={settings.reduceMotion} onChange={(v) => updateSettings({ reduceMotion: v })} label="Reduce motion" /></Row>
+          <Row title="Welcome tour" sub="A quick walkthrough of VAULT"><Button variant="dark" size="sm" onClick={() => openModal('tour')}>Replay tour</Button></Row>
         </div>
         <div className="panel p-5 sm:p-6">
           <h3 className="font-semibold flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-gold" />Responsible gaming</h3>

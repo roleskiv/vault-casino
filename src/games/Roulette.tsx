@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { sfx } from '../lib/sfx'
 import { RotateCcw, Undo2 } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Button } from '../components/ui'
@@ -76,6 +77,7 @@ export default function Roulette({ game }: { game: Game }) {
   const seg = 360 / ORDER.length
   const spin = async () => {
     if (!total || !placeBet(total)) return
+    sfx('spin')
     setSpinning(true); setResult(null); setBanner(false)
     const n = ORDER[Math.floor(rand() * ORDER.length)]
     const idx = ORDER.indexOf(n)

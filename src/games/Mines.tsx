@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { sfx } from '../lib/sfx'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '../components/ui'
 import type { Game } from '../data/games'
@@ -86,6 +87,7 @@ export default function Mines({ game }: { game: Game }) {
     const mine = layout.current[i]
     const t = tiles.map((x, k) => (k === i ? { revealed: true, mine, picked: true } : x))
     setTiles(t)
+    if (!mine) sfx('reveal')
     const pickedSet = new Set(t.map((x, k) => (x.picked ? k : -1)).filter((k) => k >= 0))
     if (mine) { setTimeout(() => finish(false, 0, 0, pickedSet), 350); return }
     const np = picks + 1
@@ -120,6 +122,7 @@ export default function Mines({ game }: { game: Game }) {
         picked.add(i)
         const mine = layout.current[i]
         setTiles((t) => t.map((x, k) => (k === i ? { revealed: true, mine, picked: true } : x)))
+        if (!mine) sfx('reveal')
         if (mine) { hit = true; break }
       }
       await new Promise((res) => setTimeout(res, 250))
