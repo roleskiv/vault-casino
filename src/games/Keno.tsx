@@ -16,8 +16,15 @@ export function kenoTable(p: number) {
   const min = p <= 2 ? 1 : p <= 4 ? 2 : Math.ceil(p * 0.4)
   const raw = Array.from({ length: p + 1 }, (_, h) => (h >= min ? Math.exp(1.3 * (h - min)) * (1 + h - min) : 0))
   const ev = raw.reduce((s, r, h) => s + r * hitChance(p, h), 0)
-  const pays = raw.map((r) => { const v = (r * 0.99) / ev; return v >= 10 ? Math.round(v) : Math.round(v * 100) / 100 })
-  return { pays, rtp: pays.reduce((s, v, h) => s + v * hitChance(p, h), 0) }
+  const roundPay = (v: number) => (v >= 100 ? Math.round(v) : v >= 10 ? Math.round(v * 10) / 10 : Math.round(v * 100) / 100)
+  const rtpOf = (pays: number[]) => pays.reduce((s, v, h) => s + v * hitChance(p, h), 0)
+  // Rounding can nudge the RTP above 99%; if it does, scale down slightly and round again.
+  let scale = 1, pays = raw.map((r) => roundPay((r * 0.99) / ev)), rtp = rtpOf(pays)
+  for (let i = 0; i < 60 && rtp > 0.99; i++) {
+    scale *= 0.9995
+    pays = raw.map((r) => roundPay((r * 0.99 * scale) / ev)); rtp = rtpOf(pays)
+  }
+  return { pays, rtp }
 }
 
 export default function Keno({ game }: { game: Game }) {

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { ArrowRight, ShieldCheck, Sparkles, Crown } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import emblem from '../assets/vault-emblem.png'
+import emblem from '../assets/vault-emblem.webp'
 import { Button } from './ui'
 
 function VaultDoor() {

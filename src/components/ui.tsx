@@ -1,8 +1,8 @@
 import { AnimatePresence, animate, motion } from 'framer-motion'
 import { Loader2, X } from 'lucide-react'
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react'
-import emblem from '../assets/vault-emblem.png'
-import wordmark from '../assets/vault-wordmark.png'
+import emblem from '../assets/vault-emblem-96.webp'
+import wordmark from '../assets/vault-wordmark.webp'
 import { cn, fmt } from '../lib/format'
 
 type Variant = 'gold' | 'dark' | 'ghost' | 'outline' | 'emerald'
