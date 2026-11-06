@@ -16,6 +16,7 @@ const OriginalsPage = lazy(() => browse().then((m) => ({ default: m.OriginalsPag
 const CategoryPage = lazy(() => browse().then((m) => ({ default: m.CategoryPage })))
 const SportsPage = lazy(() => browse().then((m) => ({ default: m.SportsPage })))
 const GamePage = lazy(() => import('./pages/GamePage'))
+const Cashier = FEATURES.REAL_MONEY ? lazy(() => import('./components/Cashier')) : null
 const PromotionsPage = lazy(() => community().then((m) => ({ default: m.PromotionsPage })))
 const TournamentsPage = lazy(() => community().then((m) => ({ default: m.TournamentsPage })))
 const LeaderboardsPage = lazy(() => community().then((m) => ({ default: m.LeaderboardsPage })))
@@ -27,6 +28,7 @@ const SettingsPage = lazy(() => account().then((m) => ({ default: m.SettingsPage
 const ResponsiblePage = lazy(() => account().then((m) => ({ default: m.ResponsiblePage })))
 const NotFound = lazy(() => account().then((m) => ({ default: m.NotFound })))
 import { useStore } from './store'
+import { FEATURES } from './config'
 import { BigWin, DailySpinModal, Tour } from './components/Polish'
 
 function Splash({ done }: { done: boolean }) {
@@ -98,6 +100,7 @@ export default function App() {
       <BottomNav onMenu={() => setDrawer(true)} onSearch={() => setSearch(true)} />
       <Toasts />
       <GlobalModals />
+      {Cashier && <Suspense fallback={null}><Cashier /></Suspense>}
       <DailySpinModal />
       <Tour />
       <BigWin />

@@ -10,6 +10,7 @@ import { tierFor } from '../data/vip'
 import { cn, fmt } from '../lib/format'
 import { useSimFeed } from '../lib/sim'
 import { useStore } from '../store'
+import { FEATURES } from '../config'
 import { DailySpinButton } from './Polish'
 import { GameArt } from './GameArt'
 import { AnimatedNumber, Button, DemoPill, Logo, Modal } from './ui'
@@ -226,8 +227,8 @@ export function TopNav({ onMenu, onActivity, activityOpen }: { onMenu: () => voi
             <button onClick={() => updateSettings({ hideBalance: !settings.hideBalance })} aria-label="Toggle balance visibility" className="hidden sm:grid h-8 w-7 place-items-center text-silver hover:text-snow">
               {settings.hideBalance ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
             </button>
-            <Button variant="gold" size="sm" className="h-8 px-2.5 sm:px-3" onClick={() => openModal('credits')}>
-              <Plus className="h-3.5 w-3.5" /><span className="hidden sm:inline">Add Credits</span>
+            <Button variant="gold" size="sm" className="h-8 px-2.5 sm:px-3" onClick={() => openModal(FEATURES.REAL_MONEY ? 'cashier' : 'credits')}>
+              <Plus className="h-3.5 w-3.5" /><span className="hidden sm:inline">{FEATURES.REAL_MONEY ? 'Cashier' : 'Add Credits'}</span>
             </Button>
           </div>
         )}

@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { uid } from './lib/format'
 import { setSfxEnabled, sfx } from './lib/sfx'
+import { checkWager, credit, debit, payoutFor } from './wallet/ledger'
 
 export interface BetRecord { id: string; game: string; gameId: string; wager: number; multiplier: number; payout: number; time: number }
 export interface Txn { id: string; type: 'credit' | 'wager' | 'payout' | 'reward'; amount: number; note: string; time: number }
@@ -63,7 +64,7 @@ function load(): State {
   return DEFAULT
 }
 
-type Modal = null | 'credits' | 'login' | 'register' | 'daily' | 'tour'
+type Modal = null | 'credits' | 'cashier' | 'login' | 'register' | 'daily' | 'tour'
 
 interface Ctx extends State {
   toasts: Toast[]
@@ -113,13 +114,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const placeBet = useCallback((wager: number) => {
     const cur = ref.current
-    if (!cur.loggedIn) { setModal('login'); return false }
-    if (!(wager > 0)) { toast({ title: 'Enter a demo wager', body: 'Wager must be greater than 0 VC.', tone: 'warn' }); return false }
-    if (cur.settings.wagerLimit > 0 && wager > cur.settings.wagerLimit) {
-      toast({ title: 'Wager limit reached', body: `Your demo limit is ${cur.settings.wagerLimit.toLocaleString()} VC per bet.`, tone: 'warn' }); return false
+    const check = checkWager({ loggedIn: cur.loggedIn, balance: cur.balance, wager, wagerLimit: cur.settings.wagerLimit })
+    if (!check.ok) {
+      if (check.reason === 'login') setModal('login')
+      else if (check.reason === 'invalid') toast({ title: 'Enter a demo wager', body: 'Wager must be greater than 0 VC.', tone: 'warn' })
+      else if (check.reason === 'limit') toast({ title: 'Wager limit reached', body: `Your demo limit is ${cur.settings.wagerLimit.toLocaleString()} VC per bet.`, tone: 'warn' })
+      else toast({ title: 'Not enough demo credits', body: 'Add free demo credits from your wallet.', tone: 'warn' })
+      return false
     }
-    if (wager > cur.balance + 1e-9) { toast({ title: 'Not enough demo credits', body: 'Add free demo credits from your wallet.', tone: 'warn' }); return false }
-    const next = { ...cur, balance: +(cur.balance - wager).toFixed(2), wagered: cur.wagered + wager }
+    const next = { ...cur, balance: debit(cur.balance, wager), wagered: cur.wagered + wager }
     ref.current = next
     setS(next)
     sfx('bet')
@@ -127,7 +130,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [toast])
 
   const settle = useCallback((gameId: string, game: string, wager: number, multiplier: number) => {
-    const payout = +(wager * multiplier).toFixed(2)
+    const payout = payoutFor(wager, multiplier)
     const time = Date.now()
     const bet: BetRecord = { id: uid(), game, gameId, wager, multiplier, payout, time }
     const big = multiplier >= 10 && payout > wager
@@ -139,7 +142,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setS((cur) => {
       const txns: Txn[] = [{ id: uid(), type: 'wager', amount: -wager, note: game, time }]
       if (payout > 0) txns.unshift({ id: uid(), type: 'payout', amount: payout, note: `${game} · ${multiplier.toFixed(2)}×`, time })
-      const next = { ...cur, balance: +(cur.balance + payout).toFixed(2), bets: [bet, ...cur.bets].slice(0, 200), txns: [...txns, ...cur.txns].slice(0, 300) }
+      const next = { ...cur, balance: credit(cur.balance, payout), bets: [bet, ...cur.bets].slice(0, 200), txns: [...txns, ...cur.txns].slice(0, 300) }
       ref.current = next
       return next
     })
